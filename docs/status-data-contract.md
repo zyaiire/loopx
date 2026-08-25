@@ -1254,7 +1254,7 @@ co-displayed global agent todo rows as goal-wide, so `--agent-id` is not
 mistaken for a filter that replaces the goal-wide queue.
 When more than one already-admitted advancement todo remains runnable, the
 same guard also includes `action_portfolio.schema_version=
-quota_action_portfolio_v1`. `primary` is the ordered recommendation, while
+quota_action_portfolio_v2`. `primary` is the ordered recommendation, while
 `suggested_actions` is the single canonical bounded convenience view: it carries
 the recommendation plus at most two ordered, agent-scoped, capability-ready
 alternatives and labels them `recommended` or `alternative`. The portfolio does
@@ -1280,6 +1280,19 @@ defers the request and keeps the receipt identity-less. A qualified request does
 not need to have appeared in the bounded suggestions. Only the upgraded response
 restores delivery and its settlement plan. If there is only one admitted action,
 no portfolio selection phase is added.
+
+When selected work has meaningful typed lineage, waiting, sibling, or
+goal-acceptance context, the same default guard may also include
+`planning_horizon.schema_version=quota_planning_horizon_v0`. It is a bounded
+read-only projection: at most five Todo items, eight typed relations, two
+acceptance gaps, and three attention ids. `source_context_todo_count` covers
+open plus deferred source Todos; omission and text-truncation counters make an
+incomplete slice explicit. `successor` remains `lineage_only`, while
+`resumes_when` and `unblocks` retain their existing typed lifecycle semantics.
+The horizon does not make another Todo executable and does not change the
+selected Todo. Consumers must use the existing explicit selection re-entry for
+another runnable action and follow `detail_refs` before treating an incomplete
+horizon as exhaustive.
 
 Correctly typed future work is handled earlier. A higher-priority
 `continuous_monitor` with a valid future `next_due_at` is not executable; quota
