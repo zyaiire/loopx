@@ -869,11 +869,13 @@ export async function evaluateSchedulerHeartbeatCommit(
       existing.reset_token === request.reset_token &&
       existing.identity_signature === request.identity_signature
     );
-    // A changed scheduler identity starts a fresh progression. Initial and
-    // identity-reset commits must begin at index zero; a stale monitor ACK is
-    // the exception to the identity-reset path, not to the initial index rule.
+    // A changed scheduler identity starts a fresh progression. This includes
+    // an exact host-match ACK: the transition kernel projects that ACK when
+    // the host already runs the initial RRULE for a reset-required identity.
+    // Stale monitor ACKs remain bound to the persisted identity. Initial and
+    // identity-reset commits must begin at index zero.
     const identityReset = existing !== null && !identityMatches &&
-      !request.host_match_observed && !isStaleMonitorAck(request);
+      !isStaleMonitorAck(request);
     if (existing !== null && !identityMatches && !identityReset) {
       return result(
         request,
